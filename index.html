@@ -8,12 +8,38 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
         (function() {
-            emailjs.init('Kr24ZD_kvQEZzqBHI');
+            emailjs.init("Kr24ZD_kvQEZzqBHI"); // Initialize with your EmailJS user ID
         })();
+        
+        function sendEmail(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            
+            // Send email using EmailJS
+            emailjs.send("service_7j3qac6", "template_psy8dsr", {
+                user_name: name,
+                user_email: email,
+                user_phone: phone,
+                subject: subject,
+                message: message
+            })
+            .then(function(response) {
+                alert('Pesan berhasil dikirim! Terima kasih telah menghubungi kami.');
+                document.getElementById('contact-form').reset();
+            }, function(error) {
+                alert('Maaf, terjadi kesalahan. Silakan coba lagi nanti.');
+                console.log('FAILED...', error);
+            });
+        }
     </script>
     <style>
         :root {
@@ -498,30 +524,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            position: relative;
-            overflow: hidden;
         }
         
         .submit-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .submit-btn.loading::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            animation: loading 1.5s infinite;
-        }
-        
-        @keyframes loading {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
         }
         
         /* Footer */
@@ -706,7 +713,7 @@
                     <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Siswa belajar">
                 </div>
                 <div class="about-text">
-                    <h3>Pendidikan Karakter Berbasis Budaya Jawa</h3>
+                    <h3>Pendidikan Digital Berbasis Budaya Jawa</h3>
                     <p>Javana Academy merupakan sebuah aplikasi pendidikan karakter yang didirikan oleh pasangan suami istri Sigit Setiawan dan Hany Anisa sebagai solusi atas tantangan pembentukan karakter generasi muda di era globalisasi yang serba cepat dan penuh distraksi dan kurang seimbang dalam penerapan sistem integrasi budaya.</p>
                     <p>Berdiri di tanah kelahiran sang istri di Wiradesa, Kabupaten Pekalongan, Javana Academy hadir untuk membentuk generasi berkarakter kuat, berintegritas, serta memiliki nilai-nilai luhur budaya bangsa yang terintegrasi dengan IPTEK.</p>
                     <p>Menggandeng para guru berpengalaman dan kompeten di bidang IPTEK dan pendidikan karakter, Javana Academy menyajikan materi interaktif berbasis nilai-nilai Pancasila, kearifan lokal, dan pendekatan psikologi perkembangan anak.</p>
@@ -793,7 +800,7 @@
                             </div>
                             <div class="contact-text">
                                 <h4>Telepon</h4>
-                                <p>+62 8781 9467 451</p>
+                                <p>+62 878 1946 7451</p>
                             </div>
                         </div>
                     </div>
@@ -808,14 +815,18 @@
                     </div>
                 </div>
                 <div class="contact-form">
-                    <form id="contactForm">
+                    <form id="contact-form" onsubmit="sendEmail(event)">
                         <div class="form-group">
                             <label for="name">Nama Lengkap</label>
-                            <input type="text" id="name" name="from_name" required>
+                            <input type="text" id="name" name="name" required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="from_email" required>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telepon</label>
+                            <input type="tel" id="phone" name="phone">
                         </div>
                         <div class="form-group">
                             <label for="subject">Subjek</label>
@@ -825,7 +836,7 @@
                             <label for="message">Pesan</label>
                             <textarea id="message" name="message" rows="5" required></textarea>
                         </div>
-                        <button type="submit" class="submit-btn" id="submitBtn">Kirim Pesan</button>
+                        <button type="submit" class="submit-btn">Kirim Pesan</button>
                     </form>
                 </div>
             </div>
@@ -854,14 +865,14 @@
                         <li><a href="#founders">Pendiri</a></li>
                         <li><a href="#contact">Kontak</a></li>
                         <li><a href="https://javanaacademy.umkmdigital.net/login" target="_blank">Login</a></li>
-                        <li><a href="https://javanaacademy.github.io/Download/" target="_blank">Download Aplikasi</a></li>
+                        <li><a href="https://ik.imagekit.io/8soozopl2/Javanaacademy-2-9.apk?updatedAt=1747991990927" download="JavanaAcademy.apk">Download Aplikasi</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h3>Kontak Kami</h3>
                     <p><i class="fas fa-map-marker-alt"></i> Kadipaten RT 01 RW 01, Kec. Wiradesa, Kab. Pekalongan, Jawa Tengah</p>
                     <p><i class="fas fa-envelope"></i> javanaacademy@gmail.com</p>
-                    <p><i class="fas fa-phone-alt"></i> +62 8781 9467 451</p>
+                    <p><i class="fas fa-phone-alt"></i> +62 878 1946 7451</p>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -869,65 +880,5 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const contactForm = document.getElementById('contactForm');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            contactForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Show loading state
-                submitBtn.disabled = true;
-                submitBtn.classList.add('loading');
-                submitBtn.textContent = 'Mengirim...';
-                
-                // Send email using EmailJS
-                emailjs.sendForm('service_7j3qac6', 'template_psy8dsr', this)
-                    .then(function(response) {
-                        // Success message
-                        Swal.fire({
-                            title: 'Pesan Terkirim!',
-                            text: 'Terima kasih telah menghubungi kami. Kami akan segera merespons pesan Anda.',
-                            icon: 'success',
-                            confirmButtonColor: '#8b0000'
-                        });
-                        
-                        // Reset form
-                        contactForm.reset();
-                    }, function(error) {
-                        // Error message
-                        Swal.fire({
-                            title: 'Gagal Mengirim',
-                            text: 'Terjadi kesalahan saat mengirim pesan. Silakan coba lagi nanti.',
-                            icon: 'error',
-                            confirmButtonColor: '#8b0000'
-                        });
-                    })
-                    .finally(function() {
-                        // Reset button state
-                        submitBtn.disabled = false;
-                        submitBtn.classList.remove('loading');
-                        submitBtn.textContent = 'Kirim Pesan';
-                    });
-            });
-            
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('nav a').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    const targetId = this.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 70,
-                        behavior: 'smooth'
-                    });
-                });
-            });
-        });
-    </script>
 </body>
 </html>
