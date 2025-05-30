@@ -17,6 +17,11 @@
         function sendEmail(e) {
             e.preventDefault();
             
+            // Show spinner and disable button
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Mengirim...';
+            
             // Get form values
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
@@ -33,13 +38,121 @@
                 message: message
             })
             .then(function(response) {
-                alert('Pesan berhasil dikirim! Terima kasih telah menghubungi kami.');
-                document.getElementById('contact-form').reset();
+                // Show success animation
+                const form = document.getElementById('contact-form');
+                form.classList.add('success-animation');
+                
+                setTimeout(() => {
+                    // Reset form and button
+                    form.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Kirim Pesan';
+                    form.classList.remove('success-animation');
+                    
+                    // Show success message with confetti
+                    showAlertWithConfetti('Pesan berhasil dikirim! Terima kasih telah menghubungi kami.');
+                }, 1500);
             }, function(error) {
-                alert('Maaf, terjadi kesalahan. Silakan coba lagi nanti.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Kirim Pesan';
+                showAlert('Maaf, terjadi kesalahan. Silakan coba lagi nanti.', 'error');
                 console.log('FAILED...', error);
             });
         }
+        
+        function showAlert(message, type = 'success') {
+            const alertBox = document.createElement('div');
+            alertBox.className = `alert-box ${type}`;
+            alertBox.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+                <i class="fas fa-times close-alert"></i>
+            `;
+            
+            document.body.appendChild(alertBox);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alertBox.classList.add('fade-out');
+                setTimeout(() => alertBox.remove(), 300);
+            }, 5000);
+            
+            // Close button
+            alertBox.querySelector('.close-alert').addEventListener('click', () => {
+                alertBox.classList.add('fade-out');
+                setTimeout(() => alertBox.remove(), 300);
+            });
+        }
+        
+        function showAlertWithConfetti(message) {
+            showAlert(message);
+            createConfetti();
+        }
+        
+        function createConfetti() {
+            const colors = ['#8b0000', '#d4af37', '#5c4d3a', '#f9f3e6', '#ffffff'];
+            const confettiContainer = document.createElement('div');
+            confettiContainer.className = 'confetti-container';
+            document.body.appendChild(confettiContainer);
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                confettiContainer.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                confettiContainer.remove();
+            }, 3000);
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.about-content, .founder-card, .vision-box, .mission-box, .contact-container > div');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            animatedElements.forEach(element => {
+                observer.observe(element);
+            });
+            
+            // Floating animation for logo
+            const logo = document.querySelector('.logo img');
+            if (logo) {
+                setInterval(() => {
+                    logo.style.transform = `translateY(${Math.sin(Date.now() / 1000) * 5}px)`;
+                }, 50);
+            }
+        });
     </script>
     <style>
         :root {
@@ -87,6 +200,13 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        header.scrolled {
+            padding: 10px 0;
+            background: rgba(139, 0, 0, 0.95);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
         
         .header-container {
@@ -106,6 +226,7 @@
             height: 50px;
             border-radius: 50%;
             border: 2px solid white;
+            transition: all 0.5s ease;
         }
         
         .logo-text h1 {
@@ -113,12 +234,14 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 3px;
+            transition: all 0.3s ease;
         }
         
         .logo-text p {
             font-size: 12px;
             opacity: 0.9;
             font-style: italic;
+            transition: all 0.3s ease;
         }
         
         nav ul {
@@ -177,6 +300,9 @@
             z-index: 1;
             color: white;
             max-width: 600px;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards 0.5s;
         }
         
         .hero-content h2 {
@@ -185,11 +311,13 @@
             font-weight: 700;
             margin-bottom: 20px;
             line-height: 1.2;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         }
         
         .hero-content p {
             font-size: 18px;
             margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
         }
         
         .cta-button {
@@ -203,12 +331,29 @@
             font-size: 16px;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
         }
         
         .cta-button:hover {
             background-color: white;
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .cta-button:hover::after {
+            left: 100%;
         }
         
         /* About Section */
@@ -246,6 +391,14 @@
             display: flex;
             gap: 50px;
             align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .about-content.animate-in {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .about-image {
@@ -254,6 +407,12 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            transform: perspective(1000px) rotateY(10deg);
+            transition: transform 0.8s ease;
+        }
+        
+        .about-content.animate-in .about-image {
+            transform: perspective(1000px) rotateY(0);
         }
         
         .about-image img {
@@ -269,6 +428,14 @@
         
         .about-text {
             flex: 1;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.8s ease 0.3s;
+        }
+        
+        .about-content.animate-in .about-text {
+            opacity: 1;
+            transform: translateX(0);
         }
         
         .about-text h3 {
@@ -301,6 +468,22 @@
             width: 300px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .founder-card.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .founder-card:nth-child(1) {
+            transition-delay: 0.2s;
+        }
+        
+        .founder-card:nth-child(2) {
+            transition-delay: 0.4s;
         }
         
         .founder-card:hover {
@@ -311,6 +494,18 @@
         .founder-image {
             height: 250px;
             overflow: hidden;
+            position: relative;
+        }
+        
+        .founder-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.7));
+            z-index: 1;
         }
         
         .founder-image img {
@@ -326,6 +521,7 @@
         
         .founder-info {
             padding: 25px;
+            position: relative;
         }
         
         .founder-info h3 {
@@ -354,14 +550,24 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             position: relative;
             overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .vision-box.animate-in, .mission-box.animate-in {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .vision-box {
             border-top: 5px solid var(--primary);
+            transition-delay: 0.2s;
         }
         
         .mission-box {
             border-top: 5px solid var(--secondary);
+            transition-delay: 0.4s;
         }
         
         .vision-box h3, .mission-box h3 {
@@ -428,6 +634,25 @@
             gap: 50px;
         }
         
+        .contact-container > div {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .contact-container > div.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .contact-container > div:first-child {
+            transition-delay: 0.2s;
+        }
+        
+        .contact-container > div:last-child {
+            transition-delay: 0.4s;
+        }
+        
         .contact-info {
             flex: 1;
         }
@@ -446,6 +671,11 @@
             display: flex;
             align-items: flex-start;
             margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .contact-item:hover {
+            transform: translateX(5px);
         }
         
         .contact-icon {
@@ -459,6 +689,12 @@
             color: white;
             margin-right: 15px;
             flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-item:hover .contact-icon {
+            transform: rotate(15deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         .contact-text h4 {
@@ -483,6 +719,13 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .contact-form:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
         
         .form-group {
@@ -524,11 +767,62 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
         }
         
         .submit-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        /* Success animation */
+        .success-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .success-animation::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--primary);
+            font-size: 60px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 11;
+            animation: checkmark 0.5s ease forwards 0.3s;
         }
         
         /* Footer */
@@ -623,6 +917,114 @@
             opacity: 0.8;
         }
         
+        /* Alert Box */
+        .alert-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(200%);
+            animation: slideIn 0.5s ease forwards;
+        }
+        
+        .alert-box.success {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        }
+        
+        .alert-box.error {
+            background: linear-gradient(135deg, #F44336, #C62828);
+        }
+        
+        .alert-box i.fa-check-circle,
+        .alert-box i.fa-exclamation-circle {
+            font-size: 20px;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+        
+        /* Confetti */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall linear forwards;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        @keyframes checkmark {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes slideIn {
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
         /* Responsive Design */
         @media (max-width: 992px) {
             .about-content, .vision-mission, .contact-container {
@@ -666,12 +1068,18 @@
             .hero-content p {
                 font-size: 16px;
             }
+            
+            .alert-box {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <header>
+    <header id="main-header">
         <div class="container header-container">
             <div class="logo">
                 <img src="https://ik.imagekit.io/nxshmubxa/file_000000009dcc622f837c0e643fb4dbd3.jpg?updatedAt=1746561648549" alt="Javana Academy Logo">
@@ -836,7 +1244,7 @@
                             <label for="message">Pesan</label>
                             <textarea id="message" name="message" rows="5" required></textarea>
                         </div>
-                        <button type="submit" class="submit-btn">Kirim Pesan</button>
+                        <button type="submit" id="submit-btn" class="submit-btn">Kirim Pesan</button>
                     </form>
                 </div>
             </div>
@@ -865,7 +1273,7 @@
                         <li><a href="#founders">Pendiri</a></li>
                         <li><a href="#contact">Kontak</a></li>
                         <li><a href="https://javanaacademy.umkmdigital.net/login" target="_blank">Login</a></li>
-                        <li><a href="https://ik.imagekit.io/8soozopl2/Javanaacademy-2-9.apk?updatedAt=1747991990927" download="JavanaAcademy.apk">Download Aplikasi</a></li>
+                        <li><a href="https://javanaacademy.github.io/Download/">Download Aplikasi</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -880,5 +1288,17 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
 </body>
 </html>
